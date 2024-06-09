@@ -61,6 +61,15 @@ Uninstalling and cleaning Nuclei...
 Nuclei has been successfully uninstalled and cleaned.
 ```
 
+## IMPORTANT
+
+Some people is experiencing issues with the installation, if this happens to you, just execute the regular installation.
+   ```bash
+   go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+   ```
+
+
+
 ## Contributions
 
 Contributions are welcome! Feel free to open an issue or submit a pull request.
