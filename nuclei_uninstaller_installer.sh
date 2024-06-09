@@ -11,12 +11,7 @@ print_orange "This tool is made with love by Albert C."
 # Function to install Nuclei
 install_tool() {
     echo "Installing Nuclei..."
-    latest_version=$(curl -s https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-    wget https://github.com/projectdiscovery/nuclei/releases/download/v${latest_version}/nuclei_${latest_version}_linux_amd64.zip -O nuclei.zip
-    unzip nuclei.zip
-    sudo mv nuclei /usr/local/bin/
-    chmod +x /usr/local/bin/nuclei
-    rm nuclei.zip
+    go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 
     if command -v nuclei &> /dev/null; then
         echo "Nuclei version $(nuclei -version) installed successfully."
