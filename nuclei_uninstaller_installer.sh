@@ -11,16 +11,23 @@ print_orange "This tool is made with love by Albert C."
 # Function to install Nuclei
 install_tool() {
     echo "Installing Nuclei..."
-    wget -qO- https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep "browser_download_url.*nuclei.*linux_amd64.zip" | cut -d : -f 2,3 | tr -d \" | wget -qi -
-    unzip nuclei_*_linux_amd64.zip
-    sudo mv nuclei /usr/local/bin/
-    chmod +x /usr/local/bin/nuclei
-    rm nuclei_*_linux_amd64.zip
+    local download_url
+    download_url=$(wget -qO- https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep -oP '"browser_download_url": "\K(.*?nuclei.*linux_amd64\.zip)(?=")')
+    
+    if [ -n "$download_url" ]; then
+        wget -q "$download_url" -O nuclei_latest_linux_amd64.zip
+        unzip -q nuclei_latest_linux_amd64.zip
+        sudo mv nuclei /usr/local/bin/
+        chmod +x /usr/local/bin/nuclei
+        rm nuclei_latest_linux_amd64.zip
 
-    if command -v nuclei &> /dev/null; then
-        echo "Nuclei version $(nuclei -version) installed successfully."
+        if command -v nuclei &> /dev/null; then
+            echo "Nuclei version $(nuclei -version) installed successfully."
+        else
+            echo "Failed to install Nuclei."
+        fi
     else
-        echo "Failed to install Nuclei."
+        echo "Failed to fetch the latest Nuclei download URL."
     fi
 }
 
@@ -42,7 +49,6 @@ uninstall_tool() {
     sudo rm -rf /usr/local/share/nuclei
     sudo rm -rf /usr/local/etc/nuclei
     sudo rm -rf /usr/local/lib/nuclei
-    sudo rm -rf /usr/local/bin/nuclei
     sudo rm -rf /usr/share/nuclei
     sudo rm -rf /etc/nuclei
     sudo rm -rf /lib/nuclei
@@ -66,28 +72,26 @@ uninstall_tool() {
     fi
 }
 
-# Main script logic
-if [[ $# -eq 0 ]]; then
-    echo "No arguments provided. Use -i to install or -u to uninstall and clean files."
-    exit 1
-fi
+# Prompt user for action
+echo "What would you like to do?"
+echo "1. Install"
+echo "2. Uninstall and clean files"
+read -p "Please enter your choice (1 or 2): " choice
 
-while getopts ":iu" option; do
-    case $option in
-        i)
-            install_tool
-            ;;
-        u)
-            read -p "Are you sure you want to uninstall and clean Nuclei? (y/n): " confirm
-            if [[ $confirm == "y" || $confirm == "Y" ]]; then
-                uninstall_tool
-            else
-                echo "Uninstallation canceled."
-            fi
-            ;;
-        *)
-            echo "Invalid option. Use -i to install or -u to uninstall and clean files."
-            exit 1
-            ;;
-    esac
-done
+# Execute based on user's choice
+case $choice in
+    1)
+        install_tool
+        ;;
+    2)
+        read -p "Are you sure you want to uninstall and clean Nuclei? (y/n): " confirm
+        if [[ $confirm == "y" || $confirm == "Y" ]]; then
+            uninstall_tool
+        else
+            echo "Uninstallation canceled."
+        fi
+        ;;
+    *)
+        echo "Invalid choice. Please run the script again and enter 1 or 2."
+        ;;
+esac
