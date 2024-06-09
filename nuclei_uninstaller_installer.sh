@@ -11,23 +11,17 @@ print_orange "This tool is made with love by Albert C."
 # Function to install Nuclei
 install_tool() {
     echo "Installing Nuclei..."
-    local download_url
-    download_url=$(wget -qO- https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep -oP '"browser_download_url": "\K(.*?nuclei.*linux_amd64\.zip)(?=")')
-    
-    if [ -n "$download_url" ]; then
-        wget -q "$download_url" -O nuclei_latest_linux_amd64.zip
-        unzip -q nuclei_latest_linux_amd64.zip
-        sudo mv nuclei /usr/local/bin/
-        chmod +x /usr/local/bin/nuclei
-        rm nuclei_latest_linux_amd64.zip
+    latest_version=$(curl -s https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+    wget https://github.com/projectdiscovery/nuclei/releases/download/v${latest_version}/nuclei_${latest_version}_linux_amd64.zip -O nuclei.zip
+    unzip nuclei.zip
+    sudo mv nuclei /usr/local/bin/
+    chmod +x /usr/local/bin/nuclei
+    rm nuclei.zip
 
-        if command -v nuclei &> /dev/null; then
-            echo "Nuclei version $(nuclei -version) installed successfully."
-        else
-            echo "Failed to install Nuclei."
-        fi
+    if command -v nuclei &> /dev/null; then
+        echo "Nuclei version $(nuclei -version) installed successfully."
     else
-        echo "Failed to fetch the latest Nuclei download URL."
+        echo "Failed to install Nuclei."
     fi
 }
 
@@ -49,6 +43,7 @@ uninstall_tool() {
     sudo rm -rf /usr/local/share/nuclei
     sudo rm -rf /usr/local/etc/nuclei
     sudo rm -rf /usr/local/lib/nuclei
+    sudo rm -rf /usr/local/bin/nuclei
     sudo rm -rf /usr/share/nuclei
     sudo rm -rf /etc/nuclei
     sudo rm -rf /lib/nuclei
