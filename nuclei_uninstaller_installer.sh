@@ -69,4 +69,25 @@ uninstall_tool() {
 # Main script logic
 if [[ $# -eq 0 ]]; then
     echo "No arguments provided. Use -i to install or -u to uninstall and clean files."
-    exit
+    exit 1
+fi
+
+while getopts ":iu" option; do
+    case $option in
+        i)
+            install_tool
+            ;;
+        u)
+            read -p "Are you sure you want to uninstall and clean Nuclei? (y/n): " confirm
+            if [[ $confirm == "y" || $confirm == "Y" ]]; then
+                uninstall_tool
+            else
+                echo "Uninstallation canceled."
+            fi
+            ;;
+        *)
+            echo "Invalid option. Use -i to install or -u to uninstall and clean files."
+            exit 1
+            ;;
+    esac
+done
