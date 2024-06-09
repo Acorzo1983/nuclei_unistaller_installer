@@ -66,26 +66,7 @@ uninstall_tool() {
     fi
 }
 
-# Prompt user for action
-echo "What would you like to do?"
-echo "1. Install"
-echo "2. Uninstall and clean files"
-read -p "Please enter your choice (1 or 2): " choice
-
-# Execute based on user's choice
-case $choice in
-    1)
-        install_tool
-        ;;
-    2)
-        read -p "Are you sure you want to uninstall and clean Nuclei? (y/n): " confirm
-        if [[ $confirm == "y" || $confirm == "Y" ]]; then
-            uninstall_tool
-        else
-            echo "Uninstallation canceled."
-        fi
-        ;;
-    *)
-        echo "Invalid choice. Please run the script again and enter 1 or 2."
-        ;;
-esac
+# Main script logic
+if [[ $# -eq 0 ]]; then
+    echo "No arguments provided. Use -i to install or -u to uninstall and clean files."
+    exit
